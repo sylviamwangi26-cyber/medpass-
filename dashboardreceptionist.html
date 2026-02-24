@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>MedPass | Receptionist Dashboard</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    .op-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .queue-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div style="padding: 20px; text-align: center;">
+      <img src="Gemini_Generated_Image_s9l9b3s9l9b3s9l9-removebg-preview.png" alt="Logo" class="logo">
+      <h2>Reception</h2>
+    </div>
+    <nav>
+      <a href="dashboardreceptionist.html" class="active"><span>📋</span> <span>Daily Queue</span></a>
+      <a href="register.html"><span>👤</span> <span>New Patient</span></a>
+      <a href="dashboardhospital.html"><span>🏢</span> <span>Hospital View</span></a>
+      <a href="settings.html"><span>⚙️</span> <span>Settings</span></a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <h1>Front Desk Operations</h1>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <span id="user-unique-id" class="tag" style="background: var(--primary); color: white;">ID: Loading...</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="op-grid">
+      <div class="card">
+        <h3>Quick Registration</h3>
+        <form id="quickRegForm">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="qName" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="qPhone" required>
+          </div>
+          <div class="form-group">
+            <label>Email (Optional)</label>
+            <input type="email" id="qEmail">
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Register & Queue</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Triage Queue</h3>
+        <div id="triageQueue" style="margin-top: 10px;">
+          <p style="color: #999;">Loading queue...</p>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 2;">
+        <h3>Quick Billing</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+          <div class="form-group">
+            <label>Patient ID</label>
+            <input type="number" id="billPID" required>
+          </div>
+          <div class="form-group">
+            <label>Amount (KES)</label>
+            <input type="number" id="billAmt" required>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="billType">
+              <option value="Cash">Cash</option>
+              <option value="Medpass">MedPass</option>
+              <option value="Insurance">Insurance</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>Description</label>
+            <input type="text" id="billDesc" placeholder="Consultation, Medication, etc">
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn-primary" style="width: 100%;" onclick="createBill()">Generate Bill</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || localStorage.getItem('role') !== 'receptionist') window.location.href = 'login.html';
+    document.getElementById('user-unique-id').innerText = "Officer ID: " + user.unique_id;
+
+    async function fetchQueue() {
+      try {
+        const res = await fetch(`/patients`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const data = await res.json();
+        const queue = document.getElementById('triageQueue');
+        queue.innerHTML = data.slice(0, 5).map(p => `
+                <div class="queue-item">
+                    <span><strong>${p.full_name || p.name}</strong><br><small>${p.unique_id}</small></span>
+                    <button class="btn-outline" style="font-size: 0.7rem;" onclick="sendToTriage(${p.id})">Send to Nurse</button>
+                </div>
+            `).join('') || '<p>Queue is empty.</p>';
+      } catch (e) { console.error(e); }
+    }
+
+    document.getElementById('quickRegForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById('qName').value,
+        phone: document.getElementById('qPhone').value,
+        email: document.getElementById('qEmail').value || `${Date.now()}@temp.com`,
+        password: 'password123',
+        role: 'patient'
+      };
+      const res = await fetch(`/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        alert("Patient registered and added to database!");
+        fetchQueue();
+        e.target.reset();
+      }
+    };
+
+    async function createBill() {
+      const patient_id = document.getElementById('billPID').value;
+      const amount = document.getElementById('billAmt').value;
+      const billing_type = document.getElementById('billType').value;
+      const description = document.getElementById('billDesc').value;
+
+      if (!patient_id || !amount) return alert("Please fill in Patient ID and Amount");
+
+      const res = await fetch(`/billing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ patient_id, amount, billing_type, description })
+      });
+
+      if (res.ok) {
+        alert("Bill generated successfully!");
+        document.getElementById('billPID').value = '';
+        document.getElementById('billAmt').value = '';
+        document.getElementById('billDesc').value = '';
+      } else {
+        const data = await res.json();
+        alert("Error: " + (data.error || "Failed to generate bill"));
+      }
+    }
+
+    function sendToTriage(patientId) {
+      alert("Patient " + patientId + " moved to Triage queue. Physical file ready.");
+    }
+
+    fetchQueue();
+    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+  </script>
+</body>
+
+</html>

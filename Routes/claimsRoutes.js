@@ -1,5 +1,6 @@
-import express from 'express';
-import * as claimsController from '../controllers/claimsController.js'; // Note the .js extension and '* as'
+// Routes/claimsRoutes.js
+const express = require('express');
+const claimsController = require('../controllers/claimsController');
 
 const router = express.Router();
 
@@ -9,5 +10,4 @@ router.post('/', claimsController.createClaim);
 router.put('/:id', claimsController.updateClaim);
 router.delete('/:id', claimsController.deleteClaim);
 
-// Change 'module.exports = router;' to 'export default router;'
-export default router;
+module.exports = router;

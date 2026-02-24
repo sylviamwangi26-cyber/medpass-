@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MedPass | Practitioner Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div style="padding: 20px; text-align: center;">
+            <img src="Gemini_Generated_Image_s9l9b3s9l9b3s9l9-removebg-preview.png" alt="Logo" class="logo">
+            <h2 id="practitioner-title">Practitioner</h2>
+        </div>
+        <nav>
+            <a href="medicalpractioner.html" class="active"><span>🏥</span> <span>Clinical Rounds</span></a>
+            <a href="#"><span>📅</span> <span>Appointments</span></a>
+            <a href="#"><span>💊</span> <span>Prescriptions</span></a>
+            <a href="settings.html"><span>⚙️</span> <span>Settings</span></a>
+        </nav>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h1 id="dashboard-title">Clinical Dashboard</h1>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span id="user-unique-id" class="tag" style="background: var(--primary); color: white;">ID:
+                    Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>My Current Patients</h3>
+                <button class="btn-primary" onclick="showReferralModal()">Create New Referral</button>
+            </div>
+            <div id="patient-list" style="margin-top: 20px;">
+                <p>Loading your assigned patients...</p>
+            </div>
+        </div>
+
+        <!-- Referral Modal -->
+        <div id="referralModal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+            <div class="card" style="width: 400px; background:white;">
+                <h3>Send Hospital Referral</h3>
+                <input type="text" id="refPatientId" placeholder="Patient ID"
+                    style="width:100%; margin-top:10px; padding:10px;">
+                <select id="refTargetHospital" style="width:100%; margin-top:10px; padding:10px;">
+                    <option value="">Select Target Hospital</option>
+                </select>
+                <textarea id="refReason" placeholder="Reason for referral..."
+                    style="width:100%; margin-top:10px; padding:10px; height:80px;"></textarea>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn-primary" onclick="submitReferral()" style="flex:1;">Submit</button>
+                    <button class="btn-outline" onclick="closeRefModal()" style="flex:1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMR / History Modal -->
+        <div id="emrModal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+            <div class="card"
+                style="width: 800px; max-height: 80vh; overflow-y: auto; background:white; padding: 30px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <h3 id="emrPatientName">Patient History</h3>
+                    <button class="btn-outline" onclick="closeEmrModal()">Close</button>
+                </div>
+
+                <div id="emrCurrentVisit"
+                    style="margin-top: 20px; padding: 15px; border: 1px solid var(--primary); border-radius: 8px;">
+                    <h4>Active Consultation</h4>
+                    <textarea id="visitNotes" placeholder="Consultation Notes..."
+                        style="width:100%; height:80px; margin-top:10px; padding:10px;"></textarea>
+                    <input type="text" id="visitMeds" placeholder="Prescribed Medications..."
+                        style="width:100%; margin-top:10px; padding:10px;">
+                    <button class="btn-primary" id="saveVisitBtn" style="margin-top:10px;">Save Consultation</button>
+                </div>
+
+                <div id="emrHistoryArea" style="margin-top: 20px;">
+                    <h4>Past Medical Records</h4>
+                    <div id="historyLogs" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+            <!-- Triage Modal (For Nurses) -->
+            <div id="triageModal"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+                <div class="card" style="width: 400px; background:white; padding: 30px;">
+                    <h3 id="triagePatientName">Patient Triage</h3>
+                    <div style="margin-top: 15px;">
+                        <div style="margin-bottom: 10px;">
+                            <label style="display:block; font-size:0.8rem;">Temperature (°C)</label>
+                            <input type="number" id="triageTemp" step="0.1" style="width:100%; padding:8px;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label style="display:block; font-size:0.8rem;">Weight (kg)</label>
+                            <input type="number" id="triageWeight" step="0.1" style="width:100%; padding:8px;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label style="display:block; font-size:0.8rem;">Blood Pressure</label>
+                            <input type="text" id="triageBP" placeholder="120/80" style="width:100%; padding:8px;">
+                        </div>
+                        <button class="btn-primary" id="saveTriageBtn" style="width:100%; margin-top:10px;">Save Vitals
+                            & Send to Doctor</button>
+                        <button class="btn-outline" onclick="closeTriageModal()"
+                            style="width:100%; margin-top:5px;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script>
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const role = localStorage.getItem('role');
+        if (!user || (role !== 'doctor' && role !== 'nurse')) window.location.href = 'login.html';
+        document.getElementById('user-unique-id').innerText = "Practitioner ID: " + user.unique_id;
+
+        async function fetchMyPatients() {
+            try {
+                const res = await fetch(`/patients${user.hospital_id ? `?hospital_id=${user.hospital_id}` : ''}`);
+                const data = await res.json();
+                const list = document.getElementById('patient-list');
+                list.innerHTML = data.map(p => `
+                    <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease;">
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem;">${p.full_name || p.name}</span><br>
+                            <small class="tag" style="font-size: 0.7rem; margin-top: 5px; display: inline-block;">${p.unique_id}</small>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            ${role === 'nurse' ?
+                        `<button class="btn-primary" style="font-size: 0.8rem; padding: 8px 16px;" onclick="openTriage(${p.id}, '${p.full_name || p.name}')">Record Vitals</button>` :
+                        `<button class="btn-outline" style="font-size: 0.8rem; padding: 8px 16px;" onclick="openEmr(${p.id}, '${p.full_name || p.name}')">Treat Patient</button>`
+                    }
+                            <button class="btn-primary" style="font-size: 0.8rem; padding: 8px 16px; background: var(--secondary);" onclick="requestLab(${p.id})">Lab Test</button>
+                            <button class="btn-outline" style="font-size: 0.8rem; padding: 8px 16px; border-color: var(--primary-light); color: var(--primary-light);" onclick="orderImaging(${p.id})">Imaging</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        let currentActivePatientId = null;
+
+        function openEmr(patientId, name) {
+            currentActivePatientId = patientId;
+            document.getElementById('emrPatientName').innerText = "History for " + name;
+            document.getElementById('emrModal').style.display = 'flex';
+            fetchHistory(patientId);
+        }
+
+        function closeEmrModal() { document.getElementById('emrModal').style.display = 'none'; }
+
+        function openTriage(patientId, name) {
+            currentActivePatientId = patientId;
+            document.getElementById('triagePatientName').innerText = "Triage for " + name;
+            document.getElementById('triageModal').style.display = 'flex';
+        }
+
+        function closeTriageModal() { document.getElementById('triageModal').style.display = 'none'; }
+
+        document.getElementById('saveTriageBtn').onclick = async () => {
+            const payload = {
+                patient_id: currentActivePatientId, // Note: backend expects visit_id, but we'll adapt or use patient_id
+                temperature: document.getElementById('triageTemp').value,
+                weight: document.getElementById('triageWeight').value,
+                blood_pressure: document.getElementById('triageBP').value,
+                recorded_by: user.id
+            };
+            const res = await fetch(`/triage/record`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                alert("Vitals saved and patient queued for Doctor!");
+                closeTriageModal();
+            }
+        };
+
+        async function fetchHistory(patientId) {
+            const logs = document.getElementById('historyLogs');
+            logs.innerHTML = "<p>Fetching history...</p>";
+            try {
+                const res = await fetch(`${getBaseUrl()}/visits/patient/${patientId}`);
+                const data = await res.json();
+                logs.innerHTML = data.map(v => `
+                    <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid var(--primary);">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #666;">
+                            <span>${new Date(v.visit_date).toLocaleDateString()} at ${v.hospital_name}</span>
+                            <span>By Dr. ${v.practitioner_name || 'Unknown'}</span>
+                        </div>
+                        <p style="margin-top: 5px;"><strong>Notes:</strong> ${v.notes || 'No notes'}</p>
+                        <p><strong>Meds:</strong> ${v.medications || 'None'}</p>
+                        ${v.test_results ? `<p style="color: blue;"><strong>Labs:</strong> ${v.test_results}</p>` : ''}
+                    </div>
+                `).join('') || '<p>No past visits found.</p>';
+            } catch (e) { logs.innerHTML = "<p>Error loading history.</p>"; }
+        }
+
+        document.getElementById('saveVisitBtn').onclick = async () => {
+            const notes = document.getElementById('visitNotes').value;
+            const medications = document.getElementById('visitMeds').value;
+            if (!notes) return alert("Please enter consultation notes");
+
+            const res = await fetch(`${getBaseUrl()}/visits`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: currentActivePatientId,
+                    practitioner_id: user.id, // Assuming practitioner user ID is what's needed
+                    hospital_id: user.hospital_id || 1,
+                    notes,
+                    medications
+                })
+            });
+            if (res.ok) {
+                alert("Consultation saved!");
+                document.getElementById('visitNotes').value = '';
+                document.getElementById('visitMeds').value = '';
+                fetchHistory(currentActivePatientId);
+            }
+        };
+
+        async function requestLab(patientId) {
+            const test_name = prompt("Enter Lab Test Name (e.g., Full Blood Count, Malaria Test):");
+            if (!test_name) return;
+            const res = await fetch(`${getBaseUrl()}/labs/request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patient_id: patientId, test_name })
+            });
+            const data = await res.json();
+            alert(data.message);
+        }
+
+        function showReferralModal() { document.getElementById('referralModal').style.display = 'flex'; }
+        function closeRefModal() { document.getElementById('referralModal').style.display = 'none'; }
+
+        async function submitReferral() {
+            const payload = {
+                patient_id: document.getElementById('refPatientId').value,
+                from_hospital_id: user.hospital_id || 1, // Fallback for demo
+                to_hospital_id: document.getElementById('refTargetHospital').value,
+                reason: document.getElementById('refReason').value
+            };
+            const res = await fetch(`${getBaseUrl()}/referrals`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(data.message);
+            closeRefModal();
+        }
+
+        async function fetchHospitals() {
+            try {
+                const res = await fetch(`${getBaseUrl()}/hospitals`);
+                const data = await res.json();
+                const select = document.getElementById('refTargetHospital');
+                select.innerHTML = '<option value="">Select Target Hospital</option>' +
+                    data.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        fetchMyPatients();
+        fetchHospitals();
+        async function orderImaging(patientId) {
+            const type = prompt("Enter Scan Type (X-Ray, MRI, Ultrasound, CT Scan):");
+            const desc = prompt("Enter Description/Reason:");
+            if (!type) return;
+            const res = await fetch(`${getBaseUrl()}/imaging/request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patient_id: patientId, imaging_type: type, description: desc })
+            });
+            if (res.ok) alert("Imaging scan ordered!");
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    </script>
+</body>
+
+</html>

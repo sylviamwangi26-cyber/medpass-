@@ -1,6 +1,6 @@
-import express from 'express';
-import * as hospitalsController from '../controllers/hospitalsController.js'; // Note the .js extension and '* as'
-
+// Routes/hospitalsRoutes.js
+const express = require('express');
+const hospitalsController = require('../controllers/hospitalsController');
 const router = express.Router();
 
 router.get('/', hospitalsController.getAllHospitals);
@@ -9,5 +9,4 @@ router.post('/', hospitalsController.createHospital);
 router.put('/:id', hospitalsController.updateHospital);
 router.delete('/:id', hospitalsController.deleteHospital);
 
-// Change 'module.exports = router;' to 'export default router;'
-export default router;
+module.exports = router;

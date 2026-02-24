@@ -1,5 +1,5 @@
-import express from 'express';
-import * as medPractionerController from '../controllers/medPractionerController.js';
+const express = require('express');
+const medPractionerController = require('../controllers/medpractionersController');
 
 const router = express.Router();
 
@@ -18,5 +18,5 @@ router.put('/:id', medPractionerController.updatePractioner);
 // Delete a medPractioner by ID
 router.delete('/:id', medPractionerController.deletePractioner);
 
-export default router;
+module.exports = router;
 

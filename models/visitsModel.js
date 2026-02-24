@@ -1,19 +1,22 @@
-// 1. Change 'exports.functionName' to 'export const functionName'
-// 2. Use '?' placeholders instead of string interpolation for security
+// models/visitsModel.js
 
-export const getAll = () => `SELECT * FROM visits`;
+module.exports = {
+  getAll: () => `SELECT * FROM visits`,
 
-// SAFE: Controller passes ID separately: db.query(getById(), [id], ...)
-export const getById = () => `SELECT * FROM visits WHERE id = ?`;
+  // SAFE: Controller passes ID separately: db.query(getById(), [id], ...)
+  getById: () => `SELECT * FROM visits WHERE id = ?`,
 
-// SAFE: Controller passes values separately: db.query(create(), [patient_id, practitioner_id, visit_date, notes], ...)
-export const create = () =>
-  `INSERT INTO visits (patient_id, practitioner_id, visit_date, notes) VALUES (?, ?, ?, ?)`;
+  getByPatientId: () => `SELECT * FROM visits WHERE patient_id = ? ORDER BY visit_date DESC`,
 
-// SAFE: Controller passes values and ID separately: db.query(update(), [visit_date, notes, id], ...)
-export const update = () =>
-  `UPDATE visits SET visit_date = ?, notes = ? WHERE id = ?`;
+  // SAFE: Controller passes values separately: db.query(create(), [patient_id, practitioner_id, hospital_id, visit_date, notes, referred_from_hospital_id], ...)
+  create: () =>
+    `INSERT INTO visits (patient_id, practitioner_id, hospital_id, visit_date, notes, referred_from_hospital_id) VALUES (?, ?, ?, ?, ?, ?)`,
 
-// Renamed 'delete' to 'remove' to avoid conflict with the reserved JS keyword
-// SAFE: Controller passes ID separately: db.query(remove(), [id], ...)
-export const remove = () => `DELETE FROM visits WHERE id = ?`;
+  // SAFE: Controller passes values and ID separately: db.query(update(), [notes, medications, test_results, id], ...)
+  update: () =>
+    `UPDATE visits SET notes = ?, medications = ?, test_results = ? WHERE id = ?`,
+
+  // Renamed 'delete' to 'remove' to avoid conflict with the reserved JS keyword
+  // SAFE: Controller passes ID separately: db.query(remove(), [id], ...)
+  remove: () => `DELETE FROM visits WHERE id = ?`
+};

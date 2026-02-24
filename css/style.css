@@ -1,0 +1,347 @@
+/* 
+  MedPass Global Styles 
+  Theme: Black, White, Purple
+*/
+
+:root {
+  --primary: #6a0dad;
+  --primary-dark: #4b0082;
+  --primary-light: #9d4edd;
+  --secondary: #000000;
+  /* Black */
+  --accent: #6a0dad;
+  --bg-body: #ffffff;
+  /* White */
+  --bg-white: #ffffff;
+  --text-main: #000000;
+  --text-muted: #4b0082;
+  --border-color: #6a0dad;
+  --shadow: 0 8px 32px 0 rgba(106, 13, 173, 0.2);
+  --glass: rgba(255, 255, 255, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary);
+  transition: 0.3s;
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+ul {
+  list-style: none;
+}
+
+/*
+  UTILITIES
+*/
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(106, 13, 173, 0.2);
+}
+
+.btn-primary:hover {
+  border-color: var(--primary-dark);
+  color: var(--text-light);
+}
+
+.btn-outline {
+  display: inline-block;
+  background-color: transparent;
+  color: var(--primary);
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  border: 2px solid var(--primary);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background-color: var(--primary);
+  color: var(--text-light);
+}
+
+/* 
+  NAVBAR 
+*/
+.navbar {
+  background-color: var(--bg-white);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-left: 10px;
+}
+
+.navbar nav a {
+  margin-left: 20px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.navbar nav a.btn-primary {
+  color: var(--text-light);
+}
+
+.navbar nav a:hover {
+  color: var(--primary);
+}
+
+.navbar nav .btn-outline {
+  color: var(--primary);
+}
+
+.navbar nav .btn-outline:hover {
+  color: var(--text-light);
+}
+
+
+/* 
+  HERO SECTION 
+*/
+.hero {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: var(--text-light);
+  text-align: center;
+  padding: 80px 20px;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.9;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.hero .btn-primary {
+  background-color: var(--bg-white);
+  color: var(--primary);
+  border-color: var(--bg-white);
+}
+
+.hero .btn-primary:hover {
+  background-color: var(--text-light);
+  color: var(--primary-dark);
+}
+
+.hero .btn-outline {
+  border-color: var(--bg-white);
+  color: var(--text-light);
+}
+
+.hero .btn-outline:hover {
+  background-color: var(--bg-white);
+  color: var(--primary);
+}
+
+/* 
+  SECTIONS 
+*/
+.section {
+  padding: 60px 40px;
+}
+
+.section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  color: var(--primary-dark);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(106, 13, 173, 0.1);
+}
+
+.glass-box {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+
+/* ROLES SECTION */
+.section.light {
+  background-color: #f9f9f9;
+}
+
+.roles {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-left: 20px;
+}
+
+.roles li {
+  margin-bottom: 15px;
+  position: relative;
+  padding-left: 25px;
+}
+
+.roles li::before {
+  content: "•";
+  color: var(--primary);
+  font-weight: bold;
+  font-size: 1.5rem;
+  position: absolute;
+  left: 0;
+  top: -5px;
+}
+
+/* CTA SECTION */
+.cta {
+  background-color: var(--accent);
+  color: var(--text-light);
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.cta h2 {
+  color: var(--text-light);
+  margin-bottom: 20px;
+}
+
+.cta p {
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.cta .btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.cta .btn-primary:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.cta .btn-outline {
+  border-color: var(--text-light);
+  color: var(--text-light);
+  margin-left: 10px;
+}
+
+.cta .btn-outline:hover {
+  background-color: var(--text-light);
+  color: var(--accent);
+}
+
+/* FOOTER */
+.footer {
+  background-color: #222;
+  color: #aaa;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .navbar nav {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .navbar nav a {
+    margin-left: 0;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+}

@@ -1,54 +1,85 @@
-// Change 'require' to 'import' and add the mandatory .js extension
-import db from '../config/db.js';
-import Patients from '../models/patientsModels.js';
+// controllers/patientsController.js
+const db = require('../config/db');
+const Patients = require('../models/patientsModel');
 
-// Change 'exports.functionName' to 'export const functionName'
+module.exports = {
+  getAllPatients: (req, res) => {
+    const { hospital_id } = req.query;
+    let sql = Patients.getAll();
+    let params = [];
 
-export const getAllPatients = (req, res) => {
-  // Model should return 'SELECT * FROM patients'
-  db.query(Patients.getAll(), (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
-};
+    if (hospital_id) {
+      // Filter patients who have visited this hospital
+      sql = `SELECT p.* FROM patients p 
+             JOIN visits v ON p.id = v.patient_id 
+             WHERE v.hospital_id = ? 
+             GROUP BY p.id`;
+      params = [hospital_id];
+    }
 
-export const getPatientById = (req, res) => {
-  const { id } = req.params;
-  // Model should return 'SELECT * FROM patients WHERE id = ?'
-  db.query(Patients.getById(), [id], (err, result) => { // Pass [id] for safety
-    if (err) return res.status(500).json({ error: err.message });
-    if (!result.length) return res.status(404).json({ message: 'Patient not found' });
-    res.json(result[0]);
-  });
-};
+    db.query(sql, params, (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(results);
+    });
+  },
 
-export const createPatient = (req, res) => {
-  const { name, dob, ward, bed_number } = req.body;
-  // Model should return 'INSERT INTO patients (...) VALUES (?, ?, ?, ?)'
-  db.query(Patients.create(), [name, dob, ward, bed_number], (err, result) => { // Pass values for safety
-    if (err) return res.status(500).json({ error: err.message });
-    res.status(201).json({ id: result.insertId, name, dob, ward, bed_number });
-  });
-};
+  getPatientById: (req, res) => {
+    const { id } = req.params;
+    db.query(Patients.getById(), [id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!result.length) return res.status(404).json({ message: 'Patient not found' });
+      res.json(result[0]);
+    });
+  },
 
-export const updatePatient = (req, res) => {
-  const { id } = req.params;
-  const { name, dob, ward, bed_number } = req.body;
-  // Model should return 'UPDATE patients SET ... WHERE id = ?'
-  db.query(Patients.update(), [name, dob, ward, bed_number, id], (err, result) => { // Pass values and ID for safety
-    if (err) return res.status(500).json({ error: err.message });
-    if (result.affectedRows === 0) return res.status(404).json({ message: 'Patient not found' });
-    res.json({ message: 'Patient updated successfully' });
-  });
-};
+  getPatientProfile: (req, res) => {
+    const { userId } = req.params;
+    const sql = `SELECT p.*, u.email, u.phone FROM patients p JOIN users u ON p.user_id = u.id WHERE u.id = ?`;
+    db.query(sql, [userId], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!result.length) return res.status(404).json({ message: 'Profile not found' });
 
-export const deletePatient = (req, res) => {
-  const { id } = req.params;
-  // Renamed the model function to 'remove' to be safer than 'delete'
-  // Model should return 'DELETE FROM patients WHERE id = ?'
-  db.query(Patients.remove(), [id], (err, result) => { // Pass [id] for safety
-    if (err) return res.status(500).json({ error: err.message });
-    if (result.affectedRows === 0) return res.status(404).json({ message: 'Patient not found' });
-    res.json({ message: 'Patient deleted successfully' });
-  });
+      const patient = result[0];
+      const familySql = `SELECT name, unique_id, medpass_plan FROM patients WHERE family_id = ? AND id != ?`;
+      db.query(familySql, [patient.family_id, patient.id], (fErr, family) => {
+        res.json({ ...patient, familyMembers: family || [] });
+      });
+    });
+  },
+
+  getPatientByUserId: (req, res) => {
+    const { userId } = req.params;
+    db.query(Patients.getByUserId(), [userId], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!result.length) return res.status(404).json({ message: 'Patient profile not found' });
+      res.json(result[0]);
+    });
+  },
+
+  createPatient: (req, res) => {
+    const { unique_id, user_id, name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan } = req.body;
+    const params = [unique_id, user_id, name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan];
+    db.query(Patients.create(), params, (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.status(201).json({ id: result.insertId, unique_id, name });
+    });
+  },
+
+  updatePatient: (req, res) => {
+    const { id } = req.params;
+    const { name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan } = req.body;
+    const params = [name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan, id];
+    db.query(Patients.update(), params, (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Patient updated successfully' });
+    });
+  },
+
+  deletePatient: (req, res) => {
+    const { id } = req.params;
+    db.query(Patients.remove(), [id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Patient deleted successfully' });
+    });
+  }
 };

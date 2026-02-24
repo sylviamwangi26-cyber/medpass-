@@ -1,19 +1,17 @@
-// 1. Change 'exports.functionName' to 'export const functionName'
-// 2. Use '?' placeholders instead of string interpolation for security
+// models/patientsModel.js
 
-export const getAll = () => `SELECT * FROM patients`;
+module.exports = {
+  getAll: () => `SELECT * FROM patients`,
 
-// SAFE: Controller passes ID separately: db.query(getById(), [id], ...)
-export const getById = () => `SELECT * FROM patients WHERE id = ?`;
+  getById: () => `SELECT * FROM patients WHERE id = ?`,
+  getByUserId: () => `SELECT * FROM patients WHERE user_id = ?`,
+  getByUniqueId: () => `SELECT * FROM patients WHERE unique_id = ?`,
 
-// SAFE: Controller passes values separately: db.query(create(), [name, dob, ward, bed_number], ...)
-export const create = () =>
-  `INSERT INTO patients (name, dob, ward, bed_number) VALUES (?, ?, ?, ?)`;
+  create: () =>
+    `INSERT INTO patients (unique_id, user_id, family_id, name, dob, gender, blood_group, allergies, location, phone, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan, national_id, primary_hospital_id, preferred_doctor_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
-// SAFE: Controller passes values and ID separately: db.query(update(), [name, dob, ward, bed_number, id], ...)
-export const update = () =>
-  `UPDATE patients SET name = ?, dob = ?, ward = ?, bed_number = ? WHERE id = ?`;
+  update: () =>
+    `UPDATE patients SET name = ?, dob = ?, gender = ?, blood_group = ?, allergies = ?, location = ?, emergency_contact = ?, profile_picture = ?, insurance_type = ?, insurance_id = ?, medpass_plan = ?, national_id = ?, primary_hospital_id = ?, preferred_doctor_name = ? WHERE id = ?`,
 
-// Renamed 'delete' to 'remove' to avoid conflict with the reserved JS keyword
-// SAFE: Controller passes ID separately: db.query(remove(), [id], ...)
-export const remove = () => `DELETE FROM patients WHERE id = ?`;
+  remove: () => `DELETE FROM patients WHERE id = ?`
+};

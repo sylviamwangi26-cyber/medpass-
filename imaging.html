@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MedPass | Imaging & Radiology</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div style="padding: 20px; text-align: center;">
+            <img src="Gemini_Generated_Image_s9l9b3s9l9b3s9l9-removebg-preview.png" alt="Logo" class="logo">
+            <h2>Radiology</h2>
+        </div>
+        <nav>
+            <a href="imaging.html" class="active"><span>📸</span> <span>Scan Requests</span></a>
+            <a href="dashboardlab.html"><span>🧪</span> <span>Lab Portal</span></a>
+            <a href="settings.html"><span>⚙️</span> <span>Settings</span></a>
+        </nav>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h1>Medical Imaging</h1>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span id="user-unique-id" class="tag" style="background: var(--primary); color: white;">ID:
+                    Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Pending Scan Requests</h3>
+            <div id="requests-list" style="margin-top: 20px;">
+                <p>Loading requests...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+        <div class="card" style="width: 400px; background:white;">
+            <h3>Upload Scan Results</h3>
+            <form id="uploadForm">
+                <input type="hidden" id="scanId">
+                <label style="display:block; margin-top:10px;">Imaging File (X-Ray/MRI Image)</label>
+                <input type="file" id="scanFile" style="width:100%; margin-top:5px;" required>
+                <label style="display:block; margin-top:10px;">Clinical Findings</label>
+                <textarea id="findings" style="width:100%; height:80px; margin-top:5px; padding:10px;"
+                    placeholder="Enter radiology findings..."></textarea>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button type="submit" class="btn-primary" style="flex:1;">Submit Results</button>
+                    <button type="button" class="btn-outline" onclick="closeModal()" style="flex:1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const allowedRoles = ['lab', 'doctor', 'radiologist'];
+        if (!user || !allowedRoles.includes(localStorage.getItem('role'))) window.location.href = 'login.html';
+        document.getElementById('user-unique-id').innerText = "Imaging Tech ID: " + user.unique_id;
+
+        async function fetchRequests() {
+            const res = await fetch(`/imaging/pending`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await res.json();
+            const list = document.getElementById('requests-list');
+            if (data.length > 0) {
+                list.innerHTML = data.map(r => `
+                    <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease;">
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem;">${r.patient_name}</span><br>
+                            <span class="tag" style="background: var(--secondary); color: white; font-size: 0.7rem; margin-top: 5px; display: inline-block;">${r.imaging_type}</span><br>
+                            <small style="color: var(--text-muted); display: block; margin-top: 5px;">${r.description || 'Routine scan request'}</small>
+                        </div>
+                        <button class="btn-primary" style="font-size: 0.8rem; padding: 8px 16px;" onclick="openUploadModal(${r.id})">Upload Scan</button>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p>No pending requests.</p>';
+            }
+        }
+
+        function openUploadModal(id) {
+            document.getElementById('scanId').value = id;
+            document.getElementById('uploadModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('uploadModal').style.display = 'none'; }
+
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('scanId').value;
+            const fileInput = document.getElementById('scanFile');
+            const findings = document.getElementById('findings').value;
+
+            const formData = new FormData();
+            formData.append('scan', fileInput.files[0]);
+
+            // 1. Upload file
+            const uploadRes = await fetch(`/imaging/upload-file`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: formData
+            });
+            const uploadData = await uploadRes.json();
+
+            if (uploadData.fileurl) {
+                // 2. Save results
+                await fetch(`/imaging/${id}/upload`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        image_url: uploadData.fileurl,
+                        results: findings,
+                        technician_id: user.id
+                    })
+                });
+                alert("Scan results uploaded!");
+                closeModal();
+                fetchRequests();
+            }
+        };
+
+        fetchRequests();
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    </script>
+</body>
+
+</html>

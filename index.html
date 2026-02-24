@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    // Safety Shield: Ensure user is on the correct port (5000)
+    if (window.location.port !== '5000' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      console.warn("⚠️ Redirecting from wrong port (" + window.location.port + ") to unified Port 5000...");
+      window.location.href = 'http://localhost:5000' + window.location.pathname;
+    }
+  </script>
+  <title>MedPass | Unified Patient Medical Records</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6a0dad;
+      --primary-dark: #4b0082;
+      --secondary: #00d1b2;
+      --accent: #ff4757;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      padding: 100px 20px;
+      color: white;
+      text-align: center;
+      clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      border: 2px solid white;
+      color: white;
+    }
+
+    .btn-outline:hover {
+      background: white;
+      color: var(--primary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo-box">
+      <img src="Gemini_Generated_Image_s9l9b3s9l9b3s9l9-removebg-preview.png" alt="Logo" style="height: 40px;">
+      <h1 class="logo-text">MedPass</h1>
+    </div>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="login.html" class="btn-outline" style="color: var(--primary); border-color: var(--primary);">Login</a>
+      <a href="register.html" class="btn-primary">Register</a>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container">
+      <h1 style="font-size: 3.5rem; letter-spacing: -1px;">Your Global Medical Passport</h1>
+      <p style="font-size: 1.4rem; max-width: 800px;">The unified identity for global healthcare. Secure, portable, and
+        data-driven records at your fingertips, anywhere in the world.</p>
+      <div class="hero-buttons">
+        <a href="register.html" class="btn-primary"
+          style="background: white; color: var(--primary); padding: 15px 40px; font-size: 1.2rem; border-radius: 50px;">Get
+          Your Passport</a>
+        <a href="login.html" class="btn-outline"
+          style="padding: 15px 40px; font-size: 1.2rem; border-radius: 50px;">Sign In</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2>Why Hospitals Choose MedPass</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Unified Data</h3>
+          <p>Instant access to patient history, allergies, and past visits from any hospital in the network.</p>
+        </div>
+        <div class="card">
+          <h3>Seamless Referrals</h3>
+          <p>Transfer patients with one click. No more lost paperwork or duplicated tests.</p>
+        </div>
+        <div class="card">
+          <h3>Automated Billing</h3>
+          <p>Integrated insurance and billing modules ensure finance teams work with real-time clinical data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section id="roles" class="section light">
+    <h2>Who Uses MedPass?</h2>
+    <p>
+      MedPass is designed for all participants in the healthcare system,
+      ensuring smooth workflow and secure access to patient records:
+    </p>
+    <ul class="roles">
+      <li><strong>Patients:</strong> Access your complete medical history, lab results, and referrals from anywhere.
+      </li>
+      <li><strong>Physicians / Doctors:</strong> View patient history, manage prescriptions, and track referrals.</li>
+      <li><strong>Nurses / Triage:</strong> Register vitals and manage the clinical intake flow.</li>
+      <li><strong>Lab Technicians:</strong> Record and share test results securely with doctors and patients.</li>
+      <li><strong>Accounts / Finance:</strong> Handle payments, insurance claims, and generate receipts efficiently.
+      </li>
+      <li><strong>Hospitals & Clinics:</strong> Receive referred patients with full medical history for better care
+        coordination.</li>
+      <li><strong>MedPass Admins:</strong> Global oversight of system users, hospitals, and security.</li>
+    </ul>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Ready to Digitize Healthcare?</h2>
+    <p>Create an account as a hospital, clinic, or individual and start managing medical records securely today.</p>
+    <a href="register.html" class="btn-primary">Create Account</a>
+    <a href="login.html" class="btn-outline">Login</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>&copy; 2026 MedPass. All rights reserved.</p>
+  </footer>
+
+</body>
+
+</html>

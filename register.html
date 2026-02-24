@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Safety Shield: Ensure user is on the correct port (5000)
+        if (window.location.port !== '5000' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+            console.warn("⚠️ Detected wrong port (" + window.location.port + "). Redirecting to Port 5000...");
+            window.location.href = 'http://localhost:5000' + window.location.pathname;
+        }
+    </script>
+    <title>MedPass | Join the Network</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6a0dad;
+            --primary-light: #9d4edd;
+            --primary-dark: #4b0082;
+            --text-dark: #1a1a1a;
+            --text-muted: #666;
+            --bg-glass: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .split-screen {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(106, 13, 173, 0.9), rgba(75, 0, 130, 0.95)),
+                url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 60px;
+            text-align: center;
+        }
+
+        .left-panel h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .left-panel p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 500px;
+        }
+
+        .right-panel {
+            width: 600px;
+            background: white;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeInRight 0.8s ease-out;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .reg-type-toggle {
+            display: flex;
+            background: #f4f4f4;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .reg-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .reg-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 13px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-light);
+            outline: none;
+            background: #fbf8ff;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(106, 13, 173, 0.4);
+        }
+
+        .pkg-card {
+            border: 2px solid #eee;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pkg-card.active {
+            border-color: var(--primary);
+            background: #f8f0ff;
+        }
+
+        @media (max-width: 1024px) {
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                width: 100%;
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="split-screen">
+        <div class="left-panel">
+            <h1>Welcome to the Future of Healthcare</h1>
+            <p>One unified medical identity for everyone. Join the network connecting patients, providers, and care
+                facilities.</p>
+        </div>
+        <div class="right-panel">
+            <div class="logo-container">
+                <img src="Gemini_Generated_Image_s9l9b3s9l9b3s9l9-removebg-preview.png" alt="Logo"
+                    style="height: 40px;">
+                <h2 style="font-weight: 800; color: var(--primary);">MedPass</h2>
+            </div>
+
+            <div class="reg-type-toggle">
+                <div class="reg-tab active" id="tab-patient" onclick="switchTab('individual')">Individual</div>
+                <div class="reg-tab" id="tab-hospital" onclick="switchTab('institution')">Institution</div>
+            </div>
+
+            <div id="languageToggle" style="text-align: right; margin-bottom: 10px;">
+                <button onclick="setLanguage('EN')"
+                    style="cursor:pointer; border:none; background:none; font-weight:bold;">EN</button> |
+                <button onclick="setLanguage('SW')" style="cursor:pointer; border:none; background:none;">SW</button>
+            </div>
+            <h2 id="regTitle">Join MedPass</h2>
+            <p id="regSubtitle">One account for all your medical needs.</p>
+
+            <form id="registerForm">
+                <div class="form-grid" id="main-fields">
+                    <div class="form-group full">
+                        <label id="lblFullName">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="John Doe" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label id="lblEmail">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="john@example.com" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label id="lblPhone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" placeholder="+254..." required />
+                    </div>
+
+                    <div class="form-group">
+                        <label id="lblPassword">Password</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label id="lblRole">Register As</label>
+                        <select id="role" name="role" onchange="handleRoleChange()" required>
+                            <option value="patient">Patient</option>
+                            <option value="doctor">Independent Doctor</option>
+                            <option value="nurse">Independent Nurse</option>
+                            <option value="hospital">Hospital/Clinic</option>
+                            <option value="medpassadmin">MedPass System Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" id="language_preference" name="language_preference" value="EN">
+
+                <!-- Patient Specific (Individual Tab) -->
+                <div id="patient-fields" class="form-grid">
+                    <div class="form-group">
+                        <label>National ID / Passport Number</label>
+                        <input type="text" id="national_id" name="national_id" placeholder="ID Number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Primary Referral Hospital</label>
+                        <select id="primary_hospital_id" name="primary_hospital_id">
+                            <option value="">Select a Hospital...</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Preferred Doctor's Name (Optional)</label>
+                        <input type="text" id="preferred_doctor_name" name="preferred_doctor_name"
+                            placeholder="Dr. Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="dob" name="dob">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Blood Group</label>
+                        <select id="blood_group" name="blood_group">
+                            <option value="O+">O+</option>
+                            <option value="A+">A+</option>
+                            <option value="B+">B+</option>
+                            <option value="AB+">AB+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Family ID (Optional)</label>
+                        <input type="text" id="family_id" name="family_id" placeholder="FAM-XXXXX">
+                    </div>
+                    <div class="form-group full">
+                        <label>Allergies / Chronic Conditions</label>
+                        <input type="text" id="allergies" name="allergies" placeholder="e.g. Penicillin, Asthma">
+                    </div>
+                    <div class="form-group full">
+                        <label>Emergency Contact</label>
+                        <input type="text" id="emergency_contact" name="emergency_contact" placeholder="Name & Phone">
+                    </div>
+                </div>
+
+                <!-- Hospital Specific (Institution Tab) -->
+                <div id="hospital-fields" class="form-grid" style="display: none;">
+                    <div class="form-group full">
+                        <label>Facility Location</label>
+                        <input type="text" id="location" name="location" placeholder="City, Area">
+                    </div>
+                    <div class="form-group">
+                        <label>No. of Doctors</label>
+                        <input type="number" id="num_doctors" name="num_doctors" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>No. of Nurses</label>
+                        <input type="number" id="num_nurses" name="num_nurses" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>No. of Wards</label>
+                        <input type="number" id="num_wards" name="num_wards" value="0">
+                    </div>
+                    <div class="form-group full">
+                        <label>Facilities Available</label>
+                        <div style="display: flex; gap: 15px; font-size: 0.85rem; flex-wrap: wrap;">
+                            <label><input type="checkbox" id="has_maternity" name="has_maternity"> Maternity</label>
+                            <label><input type="checkbox" id="has_theatre" name="has_theatre"> Operation Theatre</label>
+                            <label><input type="checkbox" id="has_lab" name="has_lab"> Lab</label>
+                            <label><input type="checkbox" id="has_pharmacy" name="has_pharmacy"> Pharmacy</label>
+                            <label><input type="checkbox" id="has_radiology" name="has_radiology"> Radiology</label>
+                            <label><input type="checkbox" id="has_account" name="has_account"> Accounts</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Specific -->
+
+                <div id="package-section" style="margin-top: 20px;">
+                    <label style="font-weight: 700; display: block; margin-bottom: 10px;">Select MedPass Plan</label>
+                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="pkg-card active" onclick="selectPkg('None', this)">
+                            <div style="font-weight: 700;">Free</div>
+                            <div style="font-size: 0.7rem; color: #666;">Pay per visit</div>
+                        </div>
+                        <div class="pkg-card" onclick="selectPkg('Basic', this)">
+                            <div style="font-weight: 700;">Basic</div>
+                            <div style="font-size: 0.7rem; color: #666;">Standard Care</div>
+                        </div>
+                        <div class="pkg-card" onclick="selectPkg('VIP', this)">
+                            <div style="font-weight: 700;">VIP</div>
+                            <div style="font-size: 0.7rem; color: #666;">Unlimited Access</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="medpass_plan" name="medpass_plan" value="None">
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top: 30px;">Complete Registration</button>
+            </form>
+            <p
+                style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 40px;">
+                Already registered? <a href="login.html" style="color: var(--primary); font-weight: 600;">Sign In</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            EN: {
+                title: "Join MedPass",
+                subtitle: "One account for all your medical needs.",
+                fullName: "Full Name",
+                email: "Email Address",
+                phone: "Phone Number",
+                password: "Password",
+                role: "Register As",
+                btn: "Create Account",
+                footer: "Already have an account?"
+            },
+            SW: {
+                title: "Jiunge na MedPass",
+                subtitle: "Akaunti moja kwa mahitaji yako yote ya matibabu.",
+                fullName: "Jina Kamili",
+                email: "Barua Pepe",
+                phone: "Namba ya Simu",
+                password: "Neno la Siri",
+                role: "Jisajili Kama",
+                btn: "Unda Akaunti",
+                footer: "Tayari una akaunti?"
+            }
+        };
+
+        function setLanguage(lang) {
+            document.getElementById('language_preference').value = lang;
+            const t = translations[lang];
+            document.getElementById('regTitle').innerText = t.title;
+            document.getElementById('regSubtitle').innerText = t.subtitle;
+            document.getElementById('lblFullName').innerText = t.fullName;
+            document.getElementById('lblEmail').innerText = t.email;
+            document.getElementById('lblPhone').innerText = t.phone;
+            document.getElementById('lblPassword').innerText = t.password;
+            document.getElementById('lblRole').innerText = t.role;
+            document.querySelector('.btn-primary').innerText = t.btn;
+            // document.querySelector('.form-footer').innerText = t.footer;
+        }
+    </script>
+    <script src="js/auth.js"></script>
+    <script>
+        function switchTab(type) {
+            document.querySelectorAll('.reg-tab').forEach(t => t.classList.remove('active'));
+            const roleSelect = document.getElementById('role');
+            const nationalId = document.getElementById('national_id');
+
+            if (type === 'individual') {
+                document.getElementById('tab-patient').classList.add('active');
+                document.getElementById('patient-fields').style.display = 'grid';
+                document.getElementById('hospital-fields').style.display = 'none';
+                document.getElementById('package-section').style.display = 'block';
+                document.getElementById('name-label').innerText = 'Full Name';
+                if (nationalId) nationalId.required = true;
+                roleSelect.innerHTML = `
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Independent Doctor</option>
+                    <option value="nurse">Independent Nurse</option>
+                    <option value="medpassadmin">MedPass System Admin</option>
+                `;
+            } else {
+                document.getElementById('tab-hospital').classList.add('active');
+                document.getElementById('patient-fields').style.display = 'none';
+                document.getElementById('hospital-fields').style.display = 'grid';
+                document.getElementById('package-section').style.display = 'none';
+                document.getElementById('name-label').innerText = 'Health Institution Name';
+                if (nationalId) nationalId.required = false;
+                roleSelect.innerHTML = `<option value="hospital">Referral Hospital / Clinic</option>`;
+            }
+            handleRoleChange();
+        }
+
+        function handleRoleChange() {
+            const role = document.getElementById('role').value;
+            const nationalIdField = document.getElementById('national_id');
+
+
+            // Only show DOB/Gender for patient
+            document.getElementById('patient-fields').style.display = (role === 'patient') ? 'grid' : 'none';
+
+            // CRITICAL FIX: Ensure national_id is NOT required if it's hidden
+            if (nationalIdField) {
+                nationalIdField.required = (role === 'patient');
+            }
+
+            // Show package only for patient
+            const packSec = document.getElementById('package-section');
+            if (packSec) packSec.style.display = (role === 'patient') ? 'block' : 'none';
+        }
+
+        function selectPkg(val, el) {
+            document.getElementById('medpass_plan').value = val;
+            document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        async function fetchHospitals() {
+            try {
+                const res = await fetch(`/hospitals`);
+                if (!res.ok) throw new Error("Failed to fetch hospitals");
+                const hospitals = await res.json();
+                const select = document.getElementById('primary_hospital_id');
+                if (select) {
+                    select.innerHTML = '<option value="">Select a Hospital...</option>';
+                    hospitals.forEach(h => {
+                        const opt = document.createElement('option');
+                        opt.value = h.id;
+                        opt.textContent = h.name;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error("Error fetching hospitals:", e);
+                // Fallback for demo if backend fails
+                const select = document.getElementById('primary_hospital_id');
+                if (select && select.options.length <= 1) {
+                    const opt = document.createElement('option');
+                    opt.value = "1";
+                    opt.textContent = "Demo Hospital (Local)";
+                    select.appendChild(opt);
+                }
+            }
+        }
+
+        // Initialize view
+        handleRoleChange();
+        fetchHospitals();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MedPass | Pharmacy Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div style="padding: 20px; text-align: center;">
+            <img src="Gemini_Generated_Image_s9l9b3s9l9b3s9l9-removebg-preview.png" alt="Logo" class="logo">
+            <h2>Pharmacy</h2>
+        </div>
+        <nav>
+            <a href="dashboardpharmacy.html" class="active"><span>💊</span> <span>Prescriptions</span></a>
+            <a href="#"><span>📦</span> <span>Inventory</span></a>
+            <a href="#"><span>📊</span> <span>Reports</span></a>
+            <a href="settings.html"><span>⚙️</span> <span>Settings</span></a>
+        </nav>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h1>Medication Fulfillment</h1>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span id="user-unique-id" class="tag" style="background: var(--primary); color: white;">ID:
+                    Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Pending Prescriptions</h3>
+            <div id="pending-meds" style="margin-top: 15px;">
+                <p>No prescriptions pending.</p>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script>
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || localStorage.getItem('role') !== 'pharmacy') window.location.href = 'login.html';
+        document.getElementById('user-unique-id').innerText = "Officer ID: " + user.unique_id;
+
+        async function fetchPrescriptions() {
+            const res = await fetch(`/pharmacy/prescriptions`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await res.json();
+            const list = document.getElementById('pending-meds');
+            if (data.length > 0) {
+                list.innerHTML = data.map(m => `
+                    <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: ${m.status === 'Not Found' ? 'rgba(255, 71, 87, 0.05)' : 'white'}; transition: all 0.2s ease;">
+                        <div>
+                            <span style="font-weight: 700; font-size: 1rem;">${m.medication_name}</span><br>
+                            <small class="tag" style="font-size: 0.7rem; margin-top: 5px; display: inline-block;">Dosage: ${m.dosage}</small><br>
+                            <small style="color: var(--text-muted); font-size: 0.75rem; display: inline-block; margin-top: 5px;">Patient: ${m.patient_name} | Status: <b style="color: ${m.status === 'Pending' ? 'orange' : 'green'}">${m.status}</b></small>
+                        </div>
+                        <div style="display:flex; gap: 10px;">
+                            ${m.status === 'Pending' ? `
+                                <button class="btn-primary" style="font-size: 0.8rem; padding: 8px 16px;" onclick="updateMedStatus(${m.id}, 'Dispensed')">Dispense & Bill</button>
+                                <button class="btn-outline" style="font-size: 0.8rem; padding: 8px 16px; border-color: var(--danger); color: var(--danger);" onclick="updateMedStatus(${m.id}, 'Not Found')">Stock Out</button>
+                            ` : `<span class="tag" style="background: var(--success); color: white;">${m.status}</span>`}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function updateMedStatus(id, status) {
+            let notes = "";
+            if (status === 'Not Found') {
+                notes = prompt("Suggest alternative location/medication:");
+                if (!notes) return;
+            }
+            const res = await fetch(`/pharmacy/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ status, pharmacist_id: user.id, notes })
+            });
+            const data = await res.json();
+            alert(data.message);
+            fetchPrescriptions();
+        }
+
+        fetchPrescriptions();
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    </script>
+</body>
+
+</html>

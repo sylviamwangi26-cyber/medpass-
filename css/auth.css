@@ -1,0 +1,204 @@
+/* ========================
+   GLOBAL STYLES
+======================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a0dad, #9d4edd);
+  /* Purple gradient */
+  color: #333;
+}
+
+/* ========================
+     CONTAINER
+  ======================== */
+.login-container,
+.register-container {
+  background: #fff;
+  padding: 50px 40px;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  width: 350px;
+  text-align: center;
+  border-top: 5px solid #6a0dad;
+}
+
+.login-container h1,
+.register-container h1 {
+  color: #6a0dad;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+/* ========================
+     FORM ELEMENTS
+  ======================== */
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #6a0dad;
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.1);
+}
+
+/* ========================
+     BUTTONS
+  ======================== */
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: #6a0dad;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #4b0082;
+}
+
+/* ========================
+     LINKS
+  ======================== */
+p {
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+a {
+  color: #6a0dad;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #4b0082;
+}
+
+/* ========================
+     ROLE TOGGLE (REGISTER)
+  ======================== */
+.role-fields {
+  display: none;
+}
+
+/* ========================
+     RESPONSIVE
+  ======================== */
+@media (max-width: 480px) {
+
+  .login-container,
+  .register-container {
+    width: 90%;
+    padding: 40px 20px;
+  }
+
+  .login-container h1,
+  .register-container h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ========================
+     SECURITY MODAL
+   ======================== */
+#security-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.security-modal {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  border-top: 5px solid #6a0dad;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.biometric-icon {
+  font-size: 4rem;
+  margin: 20px 0;
+  color: #6a0dad;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+.verifying .biometric-icon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.small {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 15px;
+}

@@ -1,5 +1,5 @@
-import express from 'express';
-import * as insuaranceproviderController from '../controllers/insuaranceproviderController.js';
+const express = require('express');
+const insuaranceproviderController = require('../controllers/insuaranceproviderController');
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.post('/', insuaranceproviderController.createProvider);
 router.put('/:id', insuaranceproviderController.updateProvider);
 router.delete('/:id', insuaranceproviderController.deleteProvider);
 
-export default router;
+module.exports = router;
