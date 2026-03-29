@@ -59,7 +59,7 @@ module.exports = {
             const smsQuery = `SELECT p.name, u.phone, l.test_name FROM lab_records l JOIN patients p ON l.patient_id = p.id JOIN users u ON p.user_id = u.id WHERE l.id = ?`;
             db.query(smsQuery, [id], (sErr, sRes) => {
                 if (!sErr && sRes[0]) {
-                    const SMS = require('../services/SMSService');
+                    const SMS = require('../services/smsService');
                     SMS.sendResultNotification(sRes[0].name, sRes[0].phone, sRes[0].test_name);
                 }
             });

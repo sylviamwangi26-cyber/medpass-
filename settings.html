@@ -109,14 +109,14 @@
                             <label>Email Address</label>
                             <input type="email" id="email" required>
                         </div>
+                        <div class="form-row">
+                            <label>Phone Number</label>
+                            <input type="text" id="phone" required>
+                        </div>
                         <div id="patient-only-fields" style="display:none;">
                             <div class="form-row">
-                                <label>Emergency Contact (Name & Phone)</label>
+                                <label>Emergency Contact (Next of Kin)</label>
                                 <input type="text" id="emergencyContact">
-                            </div>
-                            <div class="form-row">
-                                <label>Location</label>
-                                <input type="text" id="location">
                             </div>
                         </div>
                         <button type="submit" class="btn-primary">Save Changes</button>
@@ -166,6 +166,11 @@
         const role = localStorage.getItem('role');
         if (!user) window.location.href = 'login.html';
 
+        if (role === 'accounts') {
+            alert("Accounts Office is not allowed to edit the dashboard.");
+            window.location.href = 'dashboardaccount.html';
+        }
+
         // Update dashboard link based on role
         const dashLink = document.getElementById('dash-link');
         if (role === 'doctor' || role === 'nurse') dashLink.href = 'medicalpractioner.html';
@@ -180,9 +185,13 @@
         document.getElementById('user-display').innerText = user.full_name || user.name;
         document.getElementById('fullName').value = user.full_name || user.name;
         document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.phone || '';
 
         if (user.role === 'patient') {
             document.getElementById('patient-only-fields').style.display = 'block';
+            document.getElementById('fullName').readOnly = true;
+            document.getElementById('fullName').style.background = '#f4f4f4';
+            document.getElementById('fullName').title = 'Patients cannot change their Full Name';
         }
 
         function showTab(tabId) {
@@ -196,10 +205,11 @@
             e.preventDefault();
             const payload = {
                 userId: user.id,
+                role: role,
                 full_name: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
-                emergency_contact: document.getElementById('emergencyContact')?.value || '',
-                location: document.getElementById('location')?.value || ''
+                phone: document.getElementById('phone').value,
+                emergency_contact: document.getElementById('emergencyContact')?.value || ''
             };
 
             const res = await fetch(`/auth/update-profile`, {
@@ -210,8 +220,9 @@
 
             if (res.ok) {
                 alert("Profile updated!");
-                user.full_name = payload.full_name;
+                if (role !== 'patient') user.full_name = payload.full_name;
                 user.email = payload.email;
+                user.phone = payload.phone;
                 localStorage.setItem('user', JSON.stringify(user));
                 location.reload();
             } else {

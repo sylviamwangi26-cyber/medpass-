@@ -42,5 +42,14 @@ module.exports = {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Hospital deleted successfully' });
     });
+  },
+
+  verifyDirectorKey: (req, res) => {
+    const { key } = req.body;
+    const validKey = process.env.DIRECTOR_SPECIAL_KEY || '121930';
+    if (key === validKey) {
+      return res.json({ success: true, message: 'Director access granted' });
+    }
+    return res.status(403).json({ error: 'Invalid Director Special Key' });
   }
 };

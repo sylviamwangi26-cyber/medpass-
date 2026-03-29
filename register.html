@@ -261,6 +261,14 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="form-grid" id="admin-fields" style="display: none;">
+                    <div class="form-group full">
+                        <label>Admin Special Key</label>
+                        <input type="password" id="special_key" name="special_key" placeholder="Enter System Admin Key">
+                    </div>
+                </div>
+
                 <input type="hidden" id="language_preference" name="language_preference" value="EN">
 
                 <!-- Patient Specific (Individual Tab) -->
@@ -348,24 +356,7 @@
 
                 <!-- Admin Specific -->
 
-                <div id="package-section" style="margin-top: 20px;">
-                    <label style="font-weight: 700; display: block; margin-bottom: 10px;">Select MedPass Plan</label>
-                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
-                        <div class="pkg-card active" onclick="selectPkg('None', this)">
-                            <div style="font-weight: 700;">Free</div>
-                            <div style="font-size: 0.7rem; color: #666;">Pay per visit</div>
-                        </div>
-                        <div class="pkg-card" onclick="selectPkg('Basic', this)">
-                            <div style="font-weight: 700;">Basic</div>
-                            <div style="font-size: 0.7rem; color: #666;">Standard Care</div>
-                        </div>
-                        <div class="pkg-card" onclick="selectPkg('VIP', this)">
-                            <div style="font-weight: 700;">VIP</div>
-                            <div style="font-size: 0.7rem; color: #666;">Unlimited Access</div>
-                        </div>
-                    </div>
-                    <input type="hidden" id="medpass_plan" name="medpass_plan" value="None">
-                </div>
+                <!-- Removed MedPass Package Section entirely -->
 
                 <button type="submit" class="btn-primary" style="margin-top: 30px;">Complete Registration</button>
             </form>
@@ -440,7 +431,6 @@
                 document.getElementById('tab-hospital').classList.add('active');
                 document.getElementById('patient-fields').style.display = 'none';
                 document.getElementById('hospital-fields').style.display = 'grid';
-                document.getElementById('package-section').style.display = 'none';
                 document.getElementById('name-label').innerText = 'Health Institution Name';
                 if (nationalId) nationalId.required = false;
                 roleSelect.innerHTML = `<option value="hospital">Referral Hospital / Clinic</option>`;
@@ -461,9 +451,18 @@
                 nationalIdField.required = (role === 'patient');
             }
 
-            // Show package only for patient
-            const packSec = document.getElementById('package-section');
-            if (packSec) packSec.style.display = (role === 'patient') ? 'block' : 'none';
+            // Show admin special key field
+            const adminFields = document.getElementById('admin-fields');
+            const adminKeyField = document.getElementById('special_key');
+            if (adminFields && adminKeyField) {
+                if (role === 'medpassadmin' || role === 'admin') {
+                    adminFields.style.display = 'grid';
+                    adminKeyField.required = true;
+                } else {
+                    adminFields.style.display = 'none';
+                    adminKeyField.required = false;
+                }
+            }
         }
 
         function selectPkg(val, el) {

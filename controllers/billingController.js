@@ -21,32 +21,12 @@ module.exports = {
 
     createBilling: (req, res) => {
         const { patient_id, visit_id, amount, description, billing_type } = req.body;
-        const patientQuery = "SELECT medpass_plan FROM patients WHERE id = ?";
-        db.query(patientQuery, [patient_id], (pErr, pResult) => {
-            if (pErr) return res.status(500).json({ error: pErr.message });
+        const params = [patient_id, visit_id || null, amount, description, billing_type || 'Cash'];
+        const sql = `INSERT INTO billing (patient_id, visit_id, amount, description, billing_type) VALUES (?, ?, ?, ?, ?)`;
 
-            const plan = pResult[0] ? pResult[0].medpass_plan : 'None';
-            let limit = 0;
-            if (plan === 'Basic') limit = 1500;
-            else if (plan === 'Premium') limit = 4000;
-            else if (plan === 'VIP') limit = 30000;
-
-            if ((billing_type === 'MedPass' || billing_type === 'Insurance') && description.toLowerCase().includes('medication')) {
-                if (amount > limit) {
-                    return res.status(400).json({
-                        error: `Limit Exceeded: Your ${plan} plan only covers up to ${limit} KES for medications.`,
-                        limit_exceeded: true
-                    });
-                }
-            }
-
-            const params = [patient_id, visit_id || null, amount, description, billing_type || 'Cash'];
-            const sql = `INSERT INTO billing (patient_id, visit_id, amount, description, billing_type) VALUES (?, ?, ?, ?, ?)`;
-
-            db.query(sql, params, (err, result) => {
-                if (err) return res.status(500).json({ error: err.message });
-                res.status(201).json({ id: result.insertId, patient_id, visit_id, amount, description, billing_type });
-            });
+        db.query(sql, params, (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id: result.insertId, patient_id, visit_id, amount, description, billing_type });
         });
     },
 
@@ -74,7 +54,7 @@ module.exports = {
         const sql = `SELECT b.*, p.name as patient_name 
                      FROM billing b
                      JOIN patients p ON b.patient_id = p.id
-                     WHERE b.billing_type IN ('Insurance', 'Medpass')`;
+                     WHERE b.billing_type = 'Insurance'`;
         db.query(sql, (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json(results);
@@ -85,11 +65,11 @@ module.exports = {
         const { hospital_id } = req.body;
         if (!hospital_id) return res.status(400).json({ error: "Hospital ID is required" });
 
-        // SQL to update all 'Billed' MedPass records for this hospital to 'Paid'
+        // SQL to update all 'Billed' records for this hospital to 'Paid'
         const sql = `UPDATE billing b
                      JOIN visits v ON b.visit_id = v.id
                      SET b.status = 'Paid'
-                     WHERE v.hospital_id = ? AND b.billing_type = 'Medpass' AND b.status = 'Billed'`;
+                     WHERE v.hospital_id = ? AND b.billing_type = 'Insurance' AND b.status = 'Billed'`;
 
         db.query(sql, [hospital_id], (err, result) => {
             if (err) return res.status(500).json({ error: err.message });

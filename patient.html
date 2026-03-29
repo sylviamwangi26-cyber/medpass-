@@ -107,21 +107,13 @@
                         style="font-size: 0.7rem; padding: 5px; margin-top: 5px; width: 100%;">Upload ID Photo</button>
                 </div>
                 <div style="flex: 1;">
-                    <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <h2 id="patient-name-display" style="margin: 0; color: var(--primary-dark);">Loading...</h2>
-                        <span id="plan-badge" class="tag"
-                            style="background: var(--primary); color: white; padding: 8px 15px;">Basic Plan</span>
-                    </div>
+                    <h2 id="patient-name-display" style="margin: 0; color: var(--primary-dark);">Loading...</h2>
                     <div class="health-tags" style="display: flex; gap: 10px; margin-top: 15px;">
                         <span class="tag" id="blood-tag">Blood: --</span>
                         <span class="tag" id="gender-tag">Gender: --</span>
                         <span class="tag" id="location-tag">Base City: --</span>
                     </div>
-                    <div id="plan-privileges"
-                        style="margin-top: 15px; font-size: 0.85rem; padding: 10px; background: rgba(106, 13, 173, 0.05); border-radius: 10px; border: 1px dashed var(--primary);">
-                        <strong>Package Privileges:</strong> <span id="privilege-text">Access to personal records, 1
-                            scan storage, AI health tips.</span>
-                    </div>
+                    <!-- Removed Package Privileges details -->
                 </div>
             </div>
 
@@ -169,16 +161,12 @@
                             hospital visits!</p>
                     </div>
 
-                    <!-- Insurance Section -->
+                    <!-- Insurance Section Simplified -->
                     <div class="card" style="border-left: 5px solid var(--primary);">
-                        <h4>Insurance Status</h4>
+                        <h4>External Insurance</h4>
                         <div id="insurance-info"
                             style="margin: 15px 0; padding: 15px; border-radius: 8px; background: #f9f4ff;">
-                            <strong>Plan:</strong> Loading...
-                        </div>
-                        <div id="insurance-actions">
-                            <button class="btn-primary" onclick="showPurchaseModal()" style="width: 100%;">Upgrade
-                                Plan</button>
+                            <strong>Status:</strong> Use external insurance via hospital directly.
                         </div>
                     </div>
 
@@ -209,30 +197,7 @@
         </div>
     </div>
 
-    <!-- Purchase Modal (Hidden) -->
-    <div id="purchaseModal"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
-        <div class="card" style="width: 90%; max-width: 400px; background:white;">
-            <h3>Select MedPass Plan</h3>
-
-            <div style="margin-top: 15px;">
-                <label style="font-size: 0.9rem; font-weight: 600;">Choose Your Primary Hospital</label>
-                <select id="ins-hospital-select"
-                    style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ddd;">
-                    <option value="">Select Hospital...</option>
-                </select>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
-                <button class="btn-outline" onclick="buyPlan('Basic')">Basic ($0/mo)</button>
-                <button class="btn-outline" onclick="buyPlan('Premium')">Premium ($29/mo)</button>
-                <button class="btn-primary" onclick="buyPlan('VIP')">VIP ($99/mo)</button>
-            </div>
-            <button class="logout-btn" onclick="closeModal()"
-                style="margin-top:20px; width:100%; background:#666;">Cancel</button>
-        </div>
-    </div>
-    </div>
+    <!-- Removed Purchase Modal -->
 
     <script src="js/logout.js"></script>
     <script src="js/auth.js"></script>
@@ -266,47 +231,7 @@
                 });
         }
 
-        async function showPurchaseModal() {
-            document.getElementById('purchaseModal').style.display = 'flex';
-            // Fetch hospitals for selection
-            try {
-                const res = await fetch(`/hospitals`);
-                const hospitals = await res.json();
-                const select = document.getElementById('ins-hospital-select');
-                select.innerHTML = '<option value="">Select Hospital...</option>';
-                hospitals.forEach(h => {
-                    const opt = document.createElement('option');
-                    opt.value = h.id;
-                    opt.textContent = h.name;
-                    select.appendChild(opt);
-                });
-            } catch (e) { console.error(e); }
-        }
-
-        function closeModal() {
-            document.getElementById('purchaseModal').style.display = 'none';
-        }
-
-        async function buyPlan(planType) {
-            const hospitalId = document.getElementById('ins-hospital-select').value;
-            if (!hospitalId) {
-                alert("Please select a primary hospital first.");
-                return;
-            }
-            try {
-                const res = await fetch(`/insurance/purchase`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ patientId: user.id, planType, hospitalId })
-                });
-                const data = await res.json();
-                alert(data.message || data.error);
-                closeModal();
-                refreshPatientData(); // Refresh all profile data
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        // Removed showPurchaseModal, closeModal, buyPlan
 
         function viewBills() {
             fetch(`/billing`) // This would normally be filtered by patient_id
@@ -342,31 +267,9 @@
                     <div class="ai-msg">Reminder: You have a follow-up appointment in 2 weeks.</div>
                 `;
 
-                // Insurance & Passport Privileges
+                // Passport Privileges Simplified
                 const info = document.getElementById('insurance-info');
-                const actions = document.getElementById('insurance-actions');
-                const planBadge = document.getElementById('plan-badge');
-                const privilegeText = document.getElementById('privilege-text');
-
-                const plan = data.medpass_plan || 'Basic';
-                planBadge.innerText = plan + " Package";
-
-                const privileges = {
-                    'Basic': 'Unified Medical ID, 1 scan storage, Basic AI health tips.',
-                    'Premium': 'Global Portability, Priority Support, 5GB Imaging, MPC Rewards.',
-                    'VIP': 'Family Passport, Emergency Evacuation, Instant Global Sync, Exclusive Rewards.'
-                };
-                privilegeText.innerText = privileges[plan] || privileges['Basic'];
-
-                if (plan !== 'None') {
-                    info.innerHTML = `
-                        <strong>Package:</strong> <span style="color:var(--primary); font-weight:bold;">${plan}</span><br>
-                        <strong>Coverage:</strong> <span style="color: green;">✅ Active Globally</span>
-                    `;
-                    actions.innerHTML = `<p style="color:green; font-weight:600; font-size:0.8rem;">Your global medical passport is active.</p>`;
-                } else {
-                    info.innerHTML = `<strong>Passport:</strong> Inactive<br><strong>Status:</strong> <span style="color:#ffa500;">⚠️ Local Access Only</span>`;
-                }
+                info.innerHTML = `<strong>Passport:</strong> Active<br><strong>Status:</strong> <span style="color: green;">✅ Active Globally</span>`;
                 // Imaging
                 fetch(`/imaging/patient/${user.id}`)
                     .then(res => res.json())

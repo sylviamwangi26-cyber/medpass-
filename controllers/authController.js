@@ -1,7 +1,7 @@
 const User = require('../models/userModel');
 const Practitioners = require('../models/medpractionerModel');
 const db = require('../config/db');
-const SMS = require('../services/smsService');
+const SMS = require('../services/smsService'); // casing match
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -22,10 +22,17 @@ const generateToken = (user) => {
 
 module.exports = {
     register: async (req, res) => {
-        const { full_name, email, phone, password, role, hospital_id, language_preference } = req.body;
+        const { full_name, email, phone, password, role, hospital_id, language_preference, special_key } = req.body;
 
         if (!full_name || !email || !password || !role) {
             return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        if (role === 'medpassadmin' || role === 'admin') {
+            const validKey = process.env.ADMIN_SPECIAL_KEY || '123456';
+            if (special_key !== validKey) {
+                return res.status(403).json({ error: "Invalid Admin Special Key" });
+            }
         }
 
         try {
@@ -49,11 +56,11 @@ module.exports = {
 
                 // Create specific role entries
                 if (role === 'patient') {
-                    const { dob, gender, blood_group, allergies, location, emergency_contact, medpass_plan, family_id, national_id, primary_hospital_id, preferred_doctor_name } = req.body;
+                    const { dob, gender, blood_group, allergies, location, emergency_contact, family_id, national_id, primary_hospital_id, preferred_doctor_name } = req.body;
                     const patientParams = [
                         uniqueId, userId, family_id || uniqueId.replace('MP-PAT', 'MP-FAM'), full_name, dob || null, gender || null,
                         blood_group || null, allergies || null, location || null, phone || null,
-                        emergency_contact || null, null, null, null, medpass_plan || 'None',
+                        emergency_contact || null, null, null, null, null, // padding out insurance_type, insurance_id, medpass_plan with null
                         national_id || null, primary_hospital_id || null, preferred_doctor_name || null
                     ];
                     const patientSQL = `INSERT INTO patients (unique_id, user_id, family_id, name, dob, gender, blood_group, allergies, location, phone, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan, national_id, primary_hospital_id, preferred_doctor_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -178,5 +185,43 @@ module.exports = {
             delete user.password;
             res.json(user);
         });
+    },
+
+    updateProfile: (req, res) => {
+        const { userId, role, full_name, email, phone, emergency_contact } = req.body;
+        if (!userId || !role) return res.status(400).json({ error: "Missing user ID or role" });
+
+        if (role === 'accounts') {
+            return res.status(403).json({ error: "Accounts office is not permitted to edit profile" });
+        }
+
+        const updateData = { email, phone };
+
+        // Patients cannot update full_name
+        if (role !== 'patient' && full_name) {
+            updateData.full_name = full_name;
+        }
+
+        const setClauses = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
+        const userParams = [...Object.values(updateData), userId];
+
+        if (setClauses.length > 0) {
+            db.query(`UPDATE users SET ${setClauses} WHERE id = ?`, userParams, (err) => {
+                if (err) return res.status(500).json({ error: err.message });
+
+                if (role === 'patient') {
+                    // Update emergency contact and phone for patients
+                    const patientUpdateParams = [emergency_contact || null, phone || null, userId];
+                    db.query(`UPDATE patients SET emergency_contact = ?, phone = ? WHERE user_id = ?`, patientUpdateParams, (pErr) => {
+                        if (pErr) return res.status(500).json({ error: pErr.message });
+                        res.json({ message: "Profile updated successfully" });
+                    });
+                } else {
+                    res.json({ message: "Profile updated successfully" });
+                }
+            });
+        } else {
+            res.json({ message: "Nothing to update" });
+        }
     }
 };

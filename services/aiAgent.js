@@ -1,6 +1,6 @@
 // services/aiAgent.js
 const db = require('../config/db');
-const SMS = require('./SMSService');
+const SMS = require('./smsService');
 
 class AIAgent {
     constructor() { this.interval = null; }

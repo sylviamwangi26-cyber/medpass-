@@ -47,10 +47,7 @@
         <h3>Hospital Performance (Patients)</h3>
         <canvas id="hospitalChart"></canvas>
       </div>
-      <div class="chart-container card">
-        <h3>MedPass Plan Adoption</h3>
-        <canvas id="planChart"></canvas>
-      </div>
+      <!-- Removed MedPass Plan Adoption Chart -->
     </div>
     <div class="card">
       <h3>MedPass Global Portfolio</h3>
@@ -67,18 +64,10 @@
           <h4 style="color: #666; font-size: 0.8rem;">Global Revenue</h4>
           <h3 id="stat-revenue">KES 0</h3>
         </div>
-        <div style="text-align: center; padding: 10px;">
-          <h4 style="color: #666; font-size: 0.8rem;">Active Plans</h4>
-          <h3 id="stat-plans">0</h3>
-        </div>
+        <!-- Removed Active Plans -->
       </div>
 
-      <div id="plan-distribution" style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
-        <h4 style="margin-bottom: 10px;">Insurance Plan Distribution</h4>
-        <div id="plans-list" style="display: flex; gap: 20px;">
-          <!-- Plans dynamically loaded -->
-        </div>
-      </div>
+      <!-- Removed Plan Distribution -->
 
       <div id="hospital-payouts" style="margin-top: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -163,33 +152,14 @@
           }
         });
 
-        const planCtx = document.getElementById('planChart').getContext('2d');
-        new Chart(planCtx, {
-          type: 'doughnut',
-          data: {
-            labels: data.planDistribution.map(p => p.medpass_plan),
-            datasets: [{
-              data: data.planDistribution.map(p => p.count),
-              backgroundColor: ['#f3e8ff', '#9d4edd', '#6a0dad']
-            }]
-          }
-        });
+        // Removed planChart
 
         document.getElementById('stat-hospitals').innerText = data.registeredHospitals || 0;
         document.getElementById('stat-claims').innerText = data.totalClaims || 0;
         document.getElementById('stat-revenue').innerText = "KES " + (data.globalRevenue || 0).toLocaleString();
         document.getElementById('stat-liability').innerText = "KES " + (data.payoutLiability || 0).toLocaleString();
 
-        const plans = data.planDistribution || [];
-        document.getElementById('stat-plans').innerText = plans.reduce((a, b) => a + b.count, 0);
-
-        const plansDiv = document.getElementById('plans-list');
-        plansDiv.innerHTML = plans.map(p => `
-            <div style="flex: 1; padding: 10px; background: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;">
-                <strong style="color: var(--primary);">${p.medpass_plan}</strong><br>
-                <span>${p.count} Users</span>
-            </div>
-        `).join('');
+        // Removed Plan Distribution rendering
 
         const hospitalList = document.getElementById('hospital-list');
         const usage = data.hospitalUsage || [];

@@ -10,10 +10,11 @@ if (document.getElementById('registerForm')) {
     const password = document.getElementById('password')?.value;
     const role = document.getElementById('role')?.value;
     const phone = document.getElementById('phone')?.value;
+    const special_key = document.getElementById('special_key')?.value;
 
     console.log("📝 Registration Attempt:", role);
 
-    const payload = { full_name, email, phone, password, role };
+    const payload = { full_name, email, phone, password, role, special_key };
     // ... (rest of payload logic)
     if (role === 'patient' || role === 'hospital') {
       payload.location = document.getElementById('location')?.value || '';
@@ -37,7 +38,6 @@ if (document.getElementById('registerForm')) {
       payload.blood_group = document.getElementById('blood_group')?.value || '';
       payload.allergies = document.getElementById('allergies')?.value || '';
       payload.emergency_contact = document.getElementById('emergency_contact')?.value || '';
-      payload.medpass_plan = document.getElementById('medpass_plan')?.value || 'None';
       payload.family_id = document.getElementById('family_id')?.value || '';
       payload.national_id = document.getElementById('national_id')?.value || '';
       payload.primary_hospital_id = document.getElementById('primary_hospital_id')?.value || '';

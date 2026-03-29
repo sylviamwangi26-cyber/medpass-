@@ -8,5 +8,6 @@ router.get('/:id', hospitalsController.getHospitalById);
 router.post('/', hospitalsController.createHospital);
 router.put('/:id', hospitalsController.updateHospital);
 router.delete('/:id', hospitalsController.deleteHospital);
+router.post('/verify-director', hospitalsController.verifyDirectorKey);
 
 module.exports = router;

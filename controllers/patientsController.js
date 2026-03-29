@@ -57,8 +57,8 @@ module.exports = {
   },
 
   createPatient: (req, res) => {
-    const { unique_id, user_id, name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan } = req.body;
-    const params = [unique_id, user_id, name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan];
+    const { unique_id, user_id, name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id } = req.body;
+    const params = [unique_id, user_id, name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, null];
     db.query(Patients.create(), params, (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.status(201).json({ id: result.insertId, unique_id, name });
@@ -67,8 +67,8 @@ module.exports = {
 
   updatePatient: (req, res) => {
     const { id } = req.params;
-    const { name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan } = req.body;
-    const params = [name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, medpass_plan, id];
+    const { name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id } = req.body;
+    const params = [name, dob, gender, blood_group, allergies, location, emergency_contact, profile_picture, insurance_type, insurance_id, null, id];
     db.query(Patients.update(), params, (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Patient updated successfully' });

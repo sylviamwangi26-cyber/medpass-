@@ -76,149 +76,182 @@
     </div>
 
     <div id="overview-section">
-      <div class="stats-grid"
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-        <div class="card">
-          <h3>Total Revenue</h3>
-          <p id="stat-revenue" style="font-size: 1.8rem; font-weight: 800; color: var(--success);">KES 0</p>
+      <div id="director-auth-section" class="card" style="margin-bottom: 20px; text-align: center; padding: 40px;">
+        <h3>Director Access Required</h3>
+        <p style="color: #666; margin-bottom: 15px;">Please enter the Director Special Key to view hospital growth,
+          revenue, and staff numbers.</p>
+        <input type="password" id="directorKey" placeholder="Enter Key"
+          style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-right: 10px;">
+        <button onclick="verifyDirectorKey()" class="btn-primary" style="padding: 10px 20px;">Unlock Analytics</button>
+      </div>
+
+      <div id="analytics-content" style="display: none;">
+        <div class="stats-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+          <div class="card">
+            <h3>Total Revenue</h3>
+            <p id="stat-revenue" style="font-size: 1.8rem; font-weight: 800; color: var(--success);">KES 0</p>
+          </div>
+          <div class="card">
+            <h3>Total Patients</h3>
+            <p id="stat-patients" style="font-size: 1.8rem; font-weight: 800;">0</p>
+          </div>
+          <div class="card">
+            <h3>Doctors</h3>
+            <p id="stat-doctors" style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">0</p>
+          </div>
+          <div class="card">
+            <h3>Nurses</h3>
+            <p id="stat-nurses" style="font-size: 1.8rem; font-weight: 800; color: var(--secondary);">0</p>
+          </div>
         </div>
-        <div class="card">
-          <h3>Total Patients</h3>
-          <p id="stat-patients" style="font-size: 1.8rem; font-weight: 800;">0</p>
-        </div>
-        <div class="card">
-          <h3>Doctors</h3>
-          <p id="stat-doctors" style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">0</p>
-        </div>
-        <div class="card">
-          <h3>Nurses</h3>
-          <p id="stat-nurses" style="font-size: 1.8rem; font-weight: 800; color: var(--secondary);">0</p>
+
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h3>Monthly Revenue Trend</h3>
+            <canvas id="revenueChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>Revenue by Type</h3>
+            <canvas id="typeChart"></canvas>
+          </div>
         </div>
       </div>
 
-      <div class="charts-grid">
-        <div class="chart-container">
-          <h3>Monthly Revenue Trend</h3>
-          <canvas id="revenueChart"></canvas>
+      <!-- Staff Management Section -->
+      <div id="staff-section" style="display: none;">
+        <div class="card" style="margin-bottom: 20px;">
+          <h3>Add New Staff Member</h3>
+          <form id="addStaffForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+            <input type="text" id="staffName" placeholder="Full Name" required
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="email" id="staffEmail" placeholder="Email Address" required
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="text" id="staffPhone" placeholder="Phone Number"
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <select id="staffRole" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+              <option value="">Select Role</option>
+              <option value="doctor">Doctor</option>
+              <option value="nurse">Nurse</option>
+              <option value="lab">Lab Tech</option>
+              <option value="pharmacy">Pharmacist</option>
+              <option value="accounts">Accountant</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="radiologist">Radiologist</option>
+            </select>
+            <input type="text" id="staffSpec" placeholder="Specialization (Optional)"
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <button type="submit" class="btn-primary" style="padding: 10px;">Register Staff</button>
+          </form>
         </div>
-        <div class="chart-container">
-          <h3>Revenue by Type</h3>
-          <canvas id="typeChart"></canvas>
+
+        <div class="card">
+          <h3>Current Hospital Staff</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                <th style="padding: 10px;">Name</th>
+                <th style="padding: 10px;">ID</th>
+                <th style="padding: 10px;">Role</th>
+                <th style="padding: 10px;">Specialization</th>
+                <th style="padding: 10px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="staffListTable">
+              <!-- Dynamic Content -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- Staff Management Section -->
-    <div id="staff-section" style="display: none;">
-      <div class="card" style="margin-bottom: 20px;">
-        <h3>Add New Staff Member</h3>
-        <form id="addStaffForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-          <input type="text" id="staffName" placeholder="Full Name" required
-            style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-          <input type="email" id="staffEmail" placeholder="Email Address" required
-            style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-          <input type="text" id="staffPhone" placeholder="Phone Number"
-            style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-          <select id="staffRole" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <option value="">Select Role</option>
-            <option value="doctor">Doctor</option>
-            <option value="nurse">Nurse</option>
-            <option value="lab">Lab Tech</option>
-            <option value="pharmacy">Pharmacist</option>
-            <option value="accounts">Accountant</option>
-            <option value="receptionist">Receptionist</option>
-            <option value="radiologist">Radiologist</option>
-          </select>
-          <input type="text" id="staffSpec" placeholder="Specialization (Optional)"
-            style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-          <button type="submit" class="btn-primary" style="padding: 10px;">Register Staff</button>
-        </form>
-      </div>
+    <script src="js/auth.js"></script>
+    <script src="js/logout.js"></script>
+    <script>
 
-      <div class="card">
-        <h3>Current Hospital Staff</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-          <thead>
-            <tr style="text-align: left; border-bottom: 2px solid #eee;">
-              <th style="padding: 10px;">Name</th>
-              <th style="padding: 10px;">ID</th>
-              <th style="padding: 10px;">Role</th>
-              <th style="padding: 10px;">Specialization</th>
-              <th style="padding: 10px;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="staffListTable">
-            <!-- Dynamic Content -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || user.role !== 'hospital') window.location.href = 'login.html';
 
-  <script src="js/auth.js"></script>
-  <script src="js/logout.js"></script>
-  <script>
+      document.getElementById('user-unique-id').innerText = user.full_name + " (" + user.unique_id + ")";
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || user.role !== 'hospital') window.location.href = 'login.html';
+      async function verifyDirectorKey() {
+        const key = document.getElementById('directorKey').value;
 
-    document.getElementById('user-unique-id').innerText = user.full_name + " (" + user.unique_id + ")";
+        try {
+          const res = await fetch('/hospitals/verify-director', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key })
+          });
 
-    async function loadStats() {
-      const token = localStorage.getItem('token');
-      // Existing stats loading logic
-      try {
-        const res = await fetch(`/stats/hospital/${user.hospital_id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        document.getElementById('stat-revenue').innerText = "KES " + (data.totalRevenue || 0).toLocaleString();
-        document.getElementById('stat-patients').innerText = data.patientCount || 0;
-        document.getElementById('stat-doctors').innerText = data.staffTelemetry?.num_doctors || 0;
-        document.getElementById('stat-nurses').innerText = data.staffTelemetry?.num_nurses || 0;
-
-        const revCtx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(revCtx, {
-          type: 'line',
-          data: {
-            labels: data.monthlyRevenue.map(m => m.month),
-            datasets: [{
-              label: 'Revenue (KES)',
-              data: data.monthlyRevenue.map(m => m.total),
-              borderColor: '#6a0dad', tension: 0.1, fill: true, backgroundColor: 'rgba(106, 13, 173, 0.1)'
-            }]
+          if (res.ok) {
+            document.getElementById('director-auth-section').style.display = 'none';
+            document.getElementById('analytics-content').style.display = 'block';
+            loadStats();
+          } else {
+            const data = await res.json();
+            alert(data.error || "Invalid Director Special Key");
           }
-        });
+        } catch (err) {
+          alert("Verification failed: " + err.message);
+        }
+      }
 
-        const typeCtx = document.getElementById('typeChart').getContext('2d');
-        new Chart(typeCtx, {
-          type: 'doughnut',
-          data: {
-            labels: data.revenueByType.map(r => r.billing_type),
-            datasets: [{
-              data: data.revenueByType.map(r => r.total),
-              backgroundColor: ['#6a0dad', '#00d1b2', '#ffdd57', '#ff3860']
-            }]
-          }
-        });
-      } catch (e) { console.error("Stats Error:", e); }
-    }
+      async function loadStats() {
+        const token = localStorage.getItem('token');
+        // Existing stats loading logic
+        try {
+          const res = await fetch(`/stats/hospital/${user.hospital_id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await res.json();
+          document.getElementById('stat-revenue').innerText = "KES " + (data.totalRevenue || 0).toLocaleString();
+          document.getElementById('stat-patients').innerText = data.patientCount || 0;
+          document.getElementById('stat-doctors').innerText = data.staffTelemetry?.num_doctors || 0;
+          document.getElementById('stat-nurses').innerText = data.staffTelemetry?.num_nurses || 0;
 
-    function showSection(section) {
-      document.getElementById('overview-section').style.display = section === 'overview' ? 'block' : 'none';
-      document.getElementById('staff-section').style.display = section === 'staff' ? 'block' : 'none';
-      if (section === 'staff') fetchStaff();
-    }
+          const revCtx = document.getElementById('revenueChart').getContext('2d');
+          new Chart(revCtx, {
+            type: 'line',
+            data: {
+              labels: data.monthlyRevenue.map(m => m.month),
+              datasets: [{
+                label: 'Revenue (KES)',
+                data: data.monthlyRevenue.map(m => m.total),
+                borderColor: '#6a0dad', tension: 0.1, fill: true, backgroundColor: 'rgba(106, 13, 173, 0.1)'
+              }]
+            }
+          });
 
-    async function fetchStaff() {
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch(`/staff/hospital/${user.hospital_id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const staff = await res.json();
-        const table = document.getElementById('staffListTable');
-        table.innerHTML = staff.map(s => `
+          const typeCtx = document.getElementById('typeChart').getContext('2d');
+          new Chart(typeCtx, {
+            type: 'doughnut',
+            data: {
+              labels: data.revenueByType.map(r => r.billing_type),
+              datasets: [{
+                data: data.revenueByType.map(r => r.total),
+                backgroundColor: ['#6a0dad', '#00d1b2', '#ffdd57', '#ff3860']
+              }]
+            }
+          });
+        } catch (e) { console.error("Stats Error:", e); }
+      }
+
+      function showSection(section) {
+        document.getElementById('overview-section').style.display = section === 'overview' ? 'block' : 'none';
+        document.getElementById('staff-section').style.display = section === 'staff' ? 'block' : 'none';
+        if (section === 'staff') fetchStaff();
+      }
+
+      async function fetchStaff() {
+        const token = localStorage.getItem('token');
+        try {
+          const res = await fetch(`/staff/hospital/${user.hospital_id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const staff = await res.json();
+          const table = document.getElementById('staffListTable');
+          table.innerHTML = staff.map(s => `
           <tr style="border-bottom: 1px solid #eee;">
             <td style="padding: 10px;">${s.full_name}</td>
             <td style="padding: 10px;"><small class="tag">${s.unique_id}</small></td>
@@ -229,53 +262,53 @@
             </td>
           </tr>
         `).join('') || '<tr><td colspan="5" style="text-align: center; padding: 20px;">No staff found</td></tr>';
-      } catch (e) { console.error(e); }
-    }
+        } catch (e) { console.error(e); }
+      }
 
-    document.getElementById('addStaffForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const payload = {
-        full_name: document.getElementById('staffName').value,
-        email: document.getElementById('staffEmail').value,
-        phone: document.getElementById('staffPhone').value,
-        role: document.getElementById('staffRole').value,
-        specialization: document.getElementById('staffSpec').value,
-        hospital_id: user.hospital_id
+      document.getElementById('addStaffForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+          full_name: document.getElementById('staffName').value,
+          email: document.getElementById('staffEmail').value,
+          phone: document.getElementById('staffPhone').value,
+          role: document.getElementById('staffRole').value,
+          specialization: document.getElementById('staffSpec').value,
+          hospital_id: user.hospital_id
+        };
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${getBaseUrl()}/staff/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert("Staff member registered successfully!");
+          e.target.reset();
+          fetchStaff();
+        } else {
+          const data = await res.json();
+          alert("Error: " + data.error);
+        }
       };
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${getBaseUrl()}/staff/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        alert("Staff member registered successfully!");
-        e.target.reset();
-        fetchStaff();
-      } else {
-        const data = await res.json();
-        alert("Error: " + data.error);
-      }
-    };
 
-    async function removeStaff(id) {
-      if (!confirm("Are you sure you want to remove this staff member?")) return;
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${getBaseUrl()}/staff/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        alert("Staff removed");
-        fetchStaff();
+      async function removeStaff(id) {
+        if (!confirm("Are you sure you want to remove this staff member?")) return;
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${getBaseUrl()}/staff/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          alert("Staff removed");
+          fetchStaff();
+        }
       }
-    }
 
-    loadStats();
-  </script>
+      // loadStats is called only upon verifying the director key
+    </script>
 
 </body>
 

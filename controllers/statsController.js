@@ -86,17 +86,11 @@ module.exports = {
                                 if (err) return res.status(500).json({ error: err.message });
                                 stats.hospitalUsage = hospResults;
 
-                                // New: Plan Distribution
-                                db.query(`SELECT medpass_plan, COUNT(*) as count FROM patients GROUP BY medpass_plan`, (err, planResults) => {
+                                // Revenue Trend
+                                db.query(`SELECT DATE_FORMAT(created_at, '%b') as month, SUM(amount) as total FROM billing GROUP BY month`, (err, revResults) => {
                                     if (err) return res.status(500).json({ error: err.message });
-                                    stats.planDistribution = planResults;
-
-                                    // Revenue Trend
-                                    db.query(`SELECT DATE_FORMAT(created_at, '%b') as month, SUM(amount) as total FROM billing GROUP BY month`, (err, revResults) => {
-                                        if (err) return res.status(500).json({ error: err.message });
-                                        stats.monthlyRevenue = revResults;
-                                        res.json(stats);
-                                    });
+                                    stats.monthlyRevenue = revResults;
+                                    res.json(stats);
                                 });
                             });
                         });

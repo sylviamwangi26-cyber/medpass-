@@ -98,17 +98,7 @@ app.get('/debug/seed-demo-data', async (req, res) => {
         db.query(`INSERT INTO visits (patient_id, hospital_id, medications, notes) 
                   VALUES (999, 1, 'Paracetamol 500mg, Amoxicillin', 'Initial demo consultation')`);
 
-        const plans = [
-            ['Basic', 0.00, 'Unified ID, Triage History', 'Personal records, 1 scan storage, AI tips'],
-            ['Premium', 29.00, 'Global Portability, Priority Support', 'Unlimited imaging, Priority referrals, Rewards points'],
-            ['VIP', 99.00, 'Family Passport, Global Sync', 'All Premium + 5 family cover, Emergency evac, Real-time sync']
-        ];
-        plans.forEach(p => {
-            db.query(`INSERT INTO medpass_insurance_plans (plan_name, monthly_premium, benefits, privileges) 
-                      VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE monthly_premium=VALUES(monthly_premium)`, p);
-        });
-
-        res.json({ message: "Demo data and Insurance Plans seeded!" });
+        res.json({ message: "Demo data seeded!" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
