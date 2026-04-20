@@ -117,7 +117,7 @@ app.get('/', (req, res) => {
 });
 
 // Start the server
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`\n🚀 MEDPASS SYSTEM IS LIVE!`);
     console.log(`🌍 Access the Hospital Management System here: http://localhost:${PORT}`);
