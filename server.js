@@ -72,7 +72,7 @@ app.use('/awards', require('./Routes/awardsRoutes'));
 app.use('/patients', require('./Routes/patientsRoutes'));
 app.use('/visits', require('./Routes/visitsRoutes'));
 app.use('/referrals', require('./Routes/referralsRoutes'));
-app.use('/staff', require('./routes/staffRoutes'));
+app.use('/staff', require('./Routes/staffRoutes'));
 
 // AI Agent Manual Trigger
 app.get('/debug/trigger-ai', async (req, res) => {
